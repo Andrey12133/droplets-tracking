@@ -20,7 +20,6 @@ from droplets_analysis import *
 TRACK_DISTANCE = 25  # pixels
 COEFFICIENT = 1.5  # px/um
 TRACK_TIME = 3 # frames (for deleting old droplets)
-CLUSTER_COEFF = 0.05
 SCALE = 0.5  # Rescale factor for frames
 FPS = 100  # frames per second
 
@@ -62,7 +61,7 @@ def plot_graph(data):
 
 
 def save_data_to_scv(my_dict, file_name, charge_time=0):
-    read_me_name = 'descriptions_' + file_name + '.txt'
+    read_me_name = 'description' + file_name + '.txt'
     file_name_1 = file_name + '.csv'
 
     with open(read_me_name, 'w') as output_1:
@@ -102,7 +101,6 @@ def convert(o):
 
 def choose_images(ref):
     list_DIR = os.listdir(ref + '\\')
-    # List_DIR_split = [int(os.path.splitext(x)[0]) for x in list_DIR] # if int
     List_DIR_split = [os.path.splitext(x)[0] for x in list_DIR]
     Sorted_DIR = sorted(List_DIR_split)
     return Sorted_DIR
@@ -131,11 +129,9 @@ def process_list(sorted_list, data_cluster, ref):
 
 if __name__ == "__main__":
     # Directory setup and initialization
-
-    DIR = r'D:\Tiushkevich Andrei\Electrocoalescence\September_2024\Water droplets\C-Phase_Temperature\6-12kPa_T=38_V15\2'
-
-    SAVE_DIR = r'\data\test'
-    FILE_NAME = r'test_1'
+    DIR = r'\path\to\your_data'
+    SAVE_DIR = r'\processed_data'
+    FILE_NAME = r'file_name'
 
     # specify the number of the starting electrocoalescence frame and subtract 5 from it
     CHARGE_TIME = 90
@@ -143,34 +139,15 @@ if __name__ == "__main__":
     # dict for kappa, pho (l_distance)
     data_cluster = {'image': [], 'kappa': [], 'fill_rate': [], 'amount': [], 'd': [], 'l_distance': []}
 
-    save_velocity_data = True
-    test = 'velocity_8,5-12kPa.json'
-
-    # go to view_gen_params.py to see general params of emulsion flow
-    # go to compare_curves.py to compare received data
-    # go to estimate flow rate to know flow rate
-
     # set save path
     path_to_save = os.getcwd() + '\\' + SAVE_DIR
     if not os.path.isdir(path_to_save):
         os.mkdir(path_to_save)
     os.chdir(path_to_save)
 
-    #do iterations
-
-    # for folder in os.listdir(DIR+'\\'):
-    #     reff = os.path.join(DIR, folder)
-    #     # print('reff = ', reff)
-    #     sorted_image_list = choose_images(reff)
-    #     # print(sorted_image_list)
-    #     new_dict = process_list(sorted_image_list, data_cluster, reff)
-    #     data_cluster = data_cluster | new_dict
-    #     new_dict.clear()
-
     # choose files
     list_DIR = os.listdir(DIR + '\\')
-    List_DIR_split = [int(os.path.splitext(x)[0]) for x in list_DIR] # if int
-    # List_DIR_split = [os.path.splitext(x)[0] for x in list_DIR]
+    List_DIR_split = [int(os.path.splitext(x)[0]) for x in list_DIR]
     Sorted_DIR = sorted(List_DIR_split)
 
     # Iterate through images
@@ -193,13 +170,8 @@ if __name__ == "__main__":
         frame_number += 1
 
     # Save data and plot
-
     full_dict = total_drops_dict | relevant_drops_dict
     data = {key: val[0] for key, val in full_dict.items()}
-
-    if save_velocity_data:
-        with open(test, 'w') as f:
-            json.dump(data, f, indent=4, sort_keys=True, default=convert)
 
     save_data_to_scv(data_cluster, FILE_NAME, CHARGE_TIME)
     plot_graph(data_cluster)
